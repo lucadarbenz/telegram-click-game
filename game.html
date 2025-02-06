@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Game</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; padding: 20px; }
+        button { font-size: 20px; padding: 15px; background: blue; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Click per ottenere punti!</h1>
+    <p>Punti: <span id="score">0</span></p>
+    <button onclick="addPoint()">Clicca qui</button>
+
+    <script>
+        let score = 0;
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Espande la WebApp a schermo intero
+
+        function addPoint() {
+            score++;
+            document.getElementById("score").textContent = score;
+        }
+
+        // Invia i punti al bot quando l'utente chiude l'app
+        tg.onEvent("mainButtonClicked", function() {
+            fetch("https://tuo-server.com/salva_punti", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: tg.initDataUnsafe.user.id, score: score })
+            });
+            tg.close();
+        });
+
+        tg.MainButton.setText("Salva Punti");
+        tg.MainButton.show();
+    </script>
+</body>
+</html>
